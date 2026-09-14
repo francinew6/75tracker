@@ -1,0 +1,169 @@
+:root {
+  --bg: #fff5ff;
+  --bg-card: #ffffff;
+  --text: #3d3250;
+  --accent: #ff7cc4;
+  --accent-2: #7fd8ff;
+  --success: #4dbd8b;
+  --line: #f1d8ef;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at top, #ffeaf7, var(--bg));
+}
+
+h1,
+h2 {
+  margin: 0;
+}
+
+.app-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+.hero {
+  background: linear-gradient(140deg, #fff, #fff0f9);
+  border: 3px solid var(--line);
+  border-radius: 24px;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 12px 30px rgba(255, 124, 196, 0.15);
+  margin-bottom: 1.25rem;
+}
+
+.sparkles {
+  margin: 0;
+  letter-spacing: 0.35rem;
+  color: var(--accent);
+}
+
+.subtitle,
+.small-note {
+  margin: 0.45rem 0;
+  color: #6e5f89;
+}
+
+.team-counter {
+  font-weight: 700;
+  color: #604f8d;
+}
+
+.member-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.9rem;
+  margin: 0.8rem 0 1.4rem;
+}
+
+.member-card {
+  background: var(--bg-card);
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  padding: 0.9rem;
+  box-shadow: 0 8px 16px rgba(100, 80, 120, 0.08);
+}
+
+.member-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.avatar {
+  font-size: 1.8rem;
+}
+
+.name-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.4rem 0.6rem;
+  font-weight: 700;
+  color: #5c497c;
+}
+
+.counter {
+  margin: 0.7rem 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.4rem 0.65rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+  background: var(--accent);
+}
+
+button.alt {
+  background: var(--accent-2);
+  color: #2c4352;
+}
+
+button.success {
+  background: var(--success);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.board-wrap {
+  overflow-x: auto;
+  background: #fff;
+  border: 2px solid var(--line);
+  border-radius: 18px;
+}
+
+.task-board {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.task-board th,
+.task-board td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.7rem;
+  text-align: left;
+}
+
+.task-board th {
+  background: #fff6fb;
+}
+
+.status-cell {
+  text-align: center;
+}
+
+.status-label {
+  display: inline-block;
+  min-width: 3rem;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.85rem;
+  background: #ffe5f6;
+  color: #7f4668;
+}
+
+.status-label.done {
+  background: #d5f7e8;
+  color: #266847;
+}

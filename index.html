@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>75 Tracker ✨</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <p class="sparkles">✦ ✧ ✦</p>
+        <h1>75 Tracker Club</h1>
+        <p class="subtitle">Cute accountability for your 75 day challenge</p>
+        <p id="teamCounter" class="team-counter"></p>
+      </header>
+
+      <section>
+        <h2>Team Members</h2>
+        <div id="memberCards" class="member-grid"></div>
+      </section>
+
+      <section>
+        <h2>Daily Task Board</h2>
+        <p class="small-note">Check off tasks as you complete them. Your progress is saved automatically.</p>
+        <div class="board-wrap">
+          <table id="taskBoard" class="task-board"></table>
+        </div>
+      </section>
+    </main>
+
+    <script src="src/trackerState.js"></script>
+    <script src="src/main.js"></script>
+  </body>
+</html>
