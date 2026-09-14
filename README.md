@@ -5,8 +5,9 @@ A cute collaborative 75-day challenge tracker with:
 - Team member cards with names, avatars, and day counters (`0/75` to `75/75`)
 - A shared daily task board for all required challenge tasks
 - Per-person task check-offs so everyone can see who has completed what
-- Incremental progress tracking (check some tasks now, return later for more)
+- Automatic 4am rollover that clears checklists and advances each completed member's day count
 - Server-backed shared state so everyone using the same app sees the same progress
+- A cheer section for Caitlyn with encouragement confetti
 
 ## Run locally
 

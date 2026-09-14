@@ -1,20 +1,25 @@
 const {
   MAX_DAYS,
+  ROLLOVER_HOUR,
   createDefaultState,
   normalizeState,
   setTaskCompletion,
   setMemberName,
-  adjustMemberDay,
+  addMember,
   resetMember,
   isTaskDone,
   allTasksDoneForMember,
-  completeDay,
   getTeamDay
 } = window.trackerState;
 
 const memberCards = document.getElementById("memberCards");
 const taskBoard = document.getElementById("taskBoard");
 const teamCounter = document.getElementById("teamCounter");
+const addMemberForm = document.getElementById("addMemberForm");
+const nameField = document.getElementById("newMemberName");
+const avatarField = document.getElementById("newMemberAvatar");
+const cheerButton = document.getElementById("cheerButton");
+const confettiZone = document.getElementById("confettiZone");
 
 let state = createDefaultState();
 
@@ -23,6 +28,25 @@ void init();
 async function init() {
   state = await fetchState();
   render();
+  wireExtras();
+}
+
+function wireExtras() {
+  addMemberForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const name = nameField.value;
+    const avatar = avatarField.value;
+    const next = addMember(state, name, avatar);
+    if (next !== state) {
+      void saveAndRender(next);
+      nameField.value = "";
+      avatarField.value = "🐣";
+    }
+  });
+
+  cheerButton.addEventListener("click", () => {
+    showConfetti();
+  });
 }
 
 async function fetchState() {
@@ -44,17 +68,23 @@ async function saveAndRender(nextState) {
   render();
 
   try {
-    await fetch("/api/state", {
+    const response = await fetch("/api/state", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(state)
     });
+
+    if (response.ok) {
+      const synced = await response.json();
+      state = normalizeState(synced);
+      render();
+    }
   } catch {
   }
 }
 
 function render() {
-  teamCounter.textContent = `Team shared day: ${getTeamDay(state)}/${MAX_DAYS} ✨`;
+  teamCounter.textContent = `Team shared day: ${getTeamDay(state)}/${MAX_DAYS} ✨ (rollover at ${ROLLOVER_HOUR}:00)`;
   renderMemberCards();
   renderTaskBoard();
 }
@@ -74,11 +104,9 @@ function renderMemberCards() {
         <input class="name-input" data-action="rename" data-member="${member.id}" value="${escapeHtml(member.name)}" aria-label="Name for ${escapeHtml(member.name)}" />
       </div>
       <p class="counter">Day ${member.day}/${MAX_DAYS}</p>
+      <p class="status-note ${completeForToday ? "done" : "todo"}">${completeForToday ? "Ready for 4am rollover ✅" : "Tasks in progress ✨"}</p>
       <div class="actions">
-        <button class="alt" data-action="minus" data-member="${member.id}">-1 day</button>
-        <button class="alt" data-action="plus" data-member="${member.id}">+1 day</button>
-        <button class="success" data-action="complete" data-member="${member.id}" ${completeForToday ? "" : "disabled"}>Complete day</button>
-        <button data-action="reset" data-member="${member.id}">Restart</button>
+        <button data-action="reset" data-member="${member.id}">Restart from 0</button>
       </div>
     `;
 
@@ -150,24 +178,26 @@ function handleAction(event) {
   const action = event.target.dataset.action;
   const memberId = event.target.dataset.member;
 
-  if (action === "minus") {
-    void saveAndRender(adjustMemberDay(state, memberId, -1));
-    return;
-  }
-
-  if (action === "plus") {
-    void saveAndRender(adjustMemberDay(state, memberId, 1));
-    return;
-  }
-
-  if (action === "complete") {
-    void saveAndRender(completeDay(state, memberId));
-    return;
-  }
-
   if (action === "reset") {
     void saveAndRender(resetMember(state, memberId));
   }
+}
+
+function showConfetti() {
+  confettiZone.innerHTML = "";
+
+  for (let index = 0; index < 20; index += 1) {
+    const piece = document.createElement("span");
+    piece.className = "confetti";
+    piece.textContent = ["✨", "🎉", "🌸", "💫"][index % 4];
+    piece.style.left = `${Math.floor(Math.random() * 90)}%`;
+    piece.style.animationDelay = `${index * 30}ms`;
+    confettiZone.appendChild(piece);
+  }
+
+  setTimeout(() => {
+    confettiZone.innerHTML = "";
+  }, 2200);
 }
 
 function escapeHtml(text) {

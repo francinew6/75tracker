@@ -1,7 +1,7 @@
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
-const { createDefaultState, normalizeState } = require("./src/trackerState");
+const { createDefaultState, normalizeState, applyDailyRollover } = require("./src/trackerState");
 
 const PORT = Number(process.env.PORT || 4173);
 const ROOT = __dirname;
@@ -17,15 +17,18 @@ const MIME_TYPES = {
 ensureDataFile();
 
 const server = http.createServer((req, res) => {
-  if (req.url === "/api/state" && req.method === "GET") {
+  const requestUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+  const pathname = requestUrl.pathname;
+
+  if (pathname === "/api/state" && req.method === "GET") {
     return sendJson(res, 200, readState());
   }
 
-  if (req.url === "/api/state" && req.method === "PUT") {
+  if (pathname === "/api/state" && req.method === "PUT") {
     return readRequestBody(req)
       .then((body) => JSON.parse(body || "{}"))
       .then((payload) => {
-        const state = normalizeState(payload);
+        const state = applyDailyRollover(normalizeState(payload));
         fs.writeFileSync(DATA_FILE, JSON.stringify(state, null, 2));
         sendJson(res, 200, state);
       })
@@ -36,7 +39,7 @@ const server = http.createServer((req, res) => {
     return sendJson(res, 405, { error: "Method not allowed" });
   }
 
-  const requestPath = req.url === "/" ? "/index.html" : req.url;
+  const requestPath = pathname === "/" ? "/index.html" : pathname;
   const safePath = path.normalize(requestPath).replace(/^\/+/, "");
   const absolutePath = path.join(ROOT, safePath);
 
@@ -71,7 +74,7 @@ function ensureDataFile() {
 function readState() {
   try {
     const parsed = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
-    return normalizeState(parsed);
+    return applyDailyRollover(normalizeState(parsed));
   } catch {
     return createDefaultState();
   }

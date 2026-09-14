@@ -1,11 +1,10 @@
 :root {
-  --bg: #fff5ff;
   --bg-card: #ffffff;
-  --text: #3d3250;
-  --accent: #ff7cc4;
-  --accent-2: #7fd8ff;
-  --success: #4dbd8b;
-  --line: #f1d8ef;
+  --text: #2e4a40;
+  --accent: #ff8ebc;
+  --accent-2: #7ebdff;
+  --success: #4cab68;
+  --line: #d6ecd6;
 }
 
 * {
@@ -14,9 +13,23 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at top, #ffeaf7, var(--bg));
+  background: linear-gradient(to bottom, #9fd8ff 0%, #bde7ff 40%, #d7f3b0 58%, #a8db74 100%);
+}
+
+body::before {
+  content: "🌼 🌸 🌻 🌷 🌼 🌸 🌻 🌷 🌼 🌸 🌻 🌷";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.45rem 0;
+  text-align: center;
+  font-size: 1.35rem;
+  letter-spacing: 0.35rem;
+  background: rgba(90, 170, 72, 0.25);
 }
 
 h1,
@@ -25,35 +38,35 @@ h2 {
 }
 
 .app-shell {
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 2rem 1rem 3rem;
+  padding: 2rem 1rem 4.8rem;
 }
 
 .hero {
-  background: linear-gradient(140deg, #fff, #fff0f9);
-  border: 3px solid var(--line);
+  background: linear-gradient(140deg, #ffffff, #ecf9ff);
+  border: 3px solid #d4ebfb;
   border-radius: 24px;
   padding: 1rem 1.2rem;
-  box-shadow: 0 12px 30px rgba(255, 124, 196, 0.15);
+  box-shadow: 0 12px 30px rgba(40, 106, 157, 0.15);
   margin-bottom: 1.25rem;
 }
 
 .sparkles {
   margin: 0;
   letter-spacing: 0.35rem;
-  color: var(--accent);
+  color: #ff6fb0;
 }
 
 .subtitle,
 .small-note {
   margin: 0.45rem 0;
-  color: #6e5f89;
+  color: #4d6f61;
 }
 
 .team-counter {
   font-weight: 700;
-  color: #604f8d;
+  color: #2d5b9c;
 }
 
 .member-grid {
@@ -63,12 +76,14 @@ h2 {
   margin: 0.8rem 0 1.4rem;
 }
 
-.member-card {
+.member-card,
+.add-member-wrap,
+.observer-card {
   background: var(--bg-card);
   border: 2px solid var(--line);
   border-radius: 18px;
   padding: 0.9rem;
-  box-shadow: 0 8px 16px rgba(100, 80, 120, 0.08);
+  box-shadow: 0 8px 16px rgba(53, 98, 65, 0.1);
 }
 
 .member-head {
@@ -81,24 +96,37 @@ h2 {
   font-size: 1.8rem;
 }
 
-.name-input {
+.name-input,
+.add-member-form input {
   width: 100%;
-  border: 1px solid var(--line);
+  border: 1px solid #d1eac6;
   border-radius: 999px;
   padding: 0.4rem 0.6rem;
   font-weight: 700;
-  color: #5c497c;
+  color: #355b48;
 }
 
 .counter {
-  margin: 0.7rem 0;
+  margin: 0.7rem 0 0.35rem;
   font-size: 1.05rem;
   font-weight: 700;
 }
 
+.status-note {
+  margin: 0.25rem 0 0.7rem;
+  font-size: 0.9rem;
+}
+
+.status-note.done {
+  color: #257749;
+}
+
+.status-note.todo {
+  color: #4a6e60;
+}
+
 .actions {
   display: flex;
-  flex-wrap: wrap;
   gap: 0.4rem;
 }
 
@@ -114,7 +142,7 @@ button {
 
 button.alt {
   background: var(--accent-2);
-  color: #2c4352;
+  color: #25425a;
 }
 
 button.success {
@@ -124,6 +152,17 @@ button.success {
 button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+.add-member-wrap {
+  margin-bottom: 1.2rem;
+}
+
+.add-member-form {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) 90px auto;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 .board-wrap {
@@ -146,7 +185,7 @@ button:disabled {
 }
 
 .task-board th {
-  background: #fff6fb;
+  background: #ebf8e8;
 }
 
 .status-cell {
@@ -159,11 +198,49 @@ button:disabled {
   border-radius: 999px;
   padding: 0.2rem 0.55rem;
   font-size: 0.85rem;
-  background: #ffe5f6;
+  background: #f6e9f8;
   color: #7f4668;
 }
 
 .status-label.done {
   background: #d5f7e8;
   color: #266847;
+}
+
+.observer-card {
+  margin-top: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.confetti-zone {
+  position: relative;
+  height: 72px;
+}
+
+.confetti {
+  position: absolute;
+  top: -4px;
+  font-size: 1.15rem;
+  animation: floatDown 1.8s ease-out forwards;
+}
+
+@keyframes floatDown {
+  from {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(70px) rotate(45deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .add-member-form {
+    grid-template-columns: 1fr;
+  }
 }
