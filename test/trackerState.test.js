@@ -4,6 +4,7 @@ const assert = require("node:assert/strict");
 const {
   createDefaultState,
   setTaskCompletion,
+  setMemberAvatar,
   allTasksDoneForMember,
   applyDailyRollover,
   getChallengeDayKey,
@@ -57,12 +58,17 @@ test("resetMember restarts day counter and clears checklist", () => {
 
 test("can add members for later challenge joiners", () => {
   const state = createDefaultState();
-  const next = addMember(state, "Maddy", "🐼");
+  const next = addMember(state, "Maddy", state.members[0].avatar);
   const added = next.members.find((member) => member.name === "Maddy");
 
   assert.ok(added);
-  assert.equal(added.avatar, "🐼");
   assert.equal(added.day, 0);
+});
+
+test("member avatars can be updated", () => {
+  const state = createDefaultState();
+  const next = setMemberAvatar(state, state.members[0].id, "https://example.com/avatar.png");
+  assert.equal(next.members[0].avatar, "https://example.com/avatar.png");
 });
 
 test("default participant list includes all active challengers", () => {

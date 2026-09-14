@@ -24,7 +24,7 @@
         <h2>Add New Challenger</h2>
         <form id="addMemberForm" class="add-member-form">
           <input id="newMemberName" type="text" placeholder="Name or nickname" required />
-          <input id="newMemberAvatar" type="text" value="🐣" maxlength="2" aria-label="Avatar emoji" />
+          <select id="newMemberAvatar" aria-label="New member avatar"></select>
           <button type="submit" class="success">Add member</button>
         </form>
       </section>
@@ -36,15 +36,16 @@
           <table id="taskBoard" class="task-board"></table>
         </div>
       </section>
-
-      <section class="observer-card">
-        <h2>Caitlyn the Cheerleader 🐱</h2>
-        <p class="small-note">Tap for encouragement from the sidelines.</p>
-        <button id="cheerButton" class="alt" type="button">Send encouragement + confetti</button>
-        <div id="confettiZone" class="confetti-zone" aria-hidden="true"></div>
-      </section>
     </main>
 
+    <button id="caitlynButton" class="caitlyn-float" type="button" aria-label="Caitlyn sends encouragement">
+      <img src="https://github.com/user-attachments/assets/66adc648-dfc2-4ec2-a02d-281ecf07eb21" alt="Caitlyn rabbit avatar" />
+      <span>Cheer!</span>
+    </button>
+    <div id="confettiZone" class="confetti-zone" aria-hidden="true"></div>
+
+    <script src="avatars/catalog.js"></script>
+    <script src="background/catalog.js"></script>
     <script src="src/trackerState.js"></script>
     <script src="src/main.js"></script>
   </body>

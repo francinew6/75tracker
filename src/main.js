@@ -5,6 +5,7 @@ const {
   normalizeState,
   setTaskCompletion,
   setMemberName,
+  setMemberAvatar,
   addMember,
   resetMember,
   isTaskDone,
@@ -12,13 +13,16 @@ const {
   getTeamDay
 } = window.trackerState;
 
+const avatarCatalog = window.avatarCatalog || [];
+const backgroundCatalog = window.backgroundCatalog || {};
+
 const memberCards = document.getElementById("memberCards");
 const taskBoard = document.getElementById("taskBoard");
 const teamCounter = document.getElementById("teamCounter");
 const addMemberForm = document.getElementById("addMemberForm");
 const nameField = document.getElementById("newMemberName");
 const avatarField = document.getElementById("newMemberAvatar");
-const cheerButton = document.getElementById("cheerButton");
+const caitlynButton = document.getElementById("caitlynButton");
 const confettiZone = document.getElementById("confettiZone");
 
 let state = createDefaultState();
@@ -26,25 +30,36 @@ let state = createDefaultState();
 void init();
 
 async function init() {
+  applyBackgroundImage();
+  renderAvatarOptions();
   state = await fetchState();
   render();
   wireExtras();
 }
 
+function applyBackgroundImage() {
+  if (backgroundCatalog.field) {
+    document.body.style.setProperty("--field-image", `url('${backgroundCatalog.field}')`);
+  }
+}
+
+function renderAvatarOptions() {
+  const options = avatarCatalog.map((avatar) => `<option value="${avatar.url}">${escapeHtml(avatar.label)}</option>`).join("");
+  avatarField.innerHTML = options;
+}
+
 function wireExtras() {
   addMemberForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    const name = nameField.value;
-    const avatar = avatarField.value;
-    const next = addMember(state, name, avatar);
+    const next = addMember(state, nameField.value, avatarField.value);
     if (next !== state) {
       void saveAndRender(next);
       nameField.value = "";
-      avatarField.value = "🐣";
+      avatarField.selectedIndex = 0;
     }
   });
 
-  cheerButton.addEventListener("click", () => {
+  caitlynButton.addEventListener("click", () => {
     showConfetti();
   });
 }
@@ -55,9 +70,7 @@ async function fetchState() {
     if (!response.ok) {
       return createDefaultState();
     }
-
-    const parsed = await response.json();
-    return normalizeState(parsed);
+    return normalizeState(await response.json());
   } catch {
     return createDefaultState();
   }
@@ -75,8 +88,7 @@ async function saveAndRender(nextState) {
     });
 
     if (response.ok) {
-      const synced = await response.json();
-      state = normalizeState(synced);
+      state = normalizeState(await response.json());
       render();
     }
   } catch {
@@ -95,14 +107,18 @@ function renderMemberCards() {
   state.members.forEach((member) => {
     const card = document.createElement("article");
     card.className = "member-card";
-
     const completeForToday = allTasksDoneForMember(state, member.id);
+
+    const avatarOptions = avatarCatalog
+      .map((avatar) => `<option value="${avatar.url}" ${member.avatar === avatar.url ? "selected" : ""}>${escapeHtml(avatar.label)}</option>`)
+      .join("");
 
     card.innerHTML = `
       <div class="member-head">
-        <span class="avatar" aria-hidden="true">${member.avatar}</span>
+        <img class="avatar" src="${member.avatar}" alt="${escapeHtml(member.name)} avatar" />
         <input class="name-input" data-action="rename" data-member="${member.id}" value="${escapeHtml(member.name)}" aria-label="Name for ${escapeHtml(member.name)}" />
       </div>
+      <select class="avatar-select" data-action="avatar" data-member="${member.id}" aria-label="Avatar for ${escapeHtml(member.name)}">${avatarOptions}</select>
       <p class="counter">Day ${member.day}/${MAX_DAYS}</p>
       <p class="status-note ${completeForToday ? "done" : "todo"}">${completeForToday ? "Ready for 4am rollover ✅" : "Tasks in progress ✨"}</p>
       <div class="actions">
@@ -119,16 +135,19 @@ function renderMemberCards() {
 
   memberCards.querySelectorAll("input[data-action='rename']").forEach((input) => {
     input.addEventListener("change", (event) => {
-      const memberId = event.target.dataset.member;
-      void saveAndRender(setMemberName(state, memberId, event.target.value));
+      void saveAndRender(setMemberName(state, event.target.dataset.member, event.target.value));
+    });
+  });
+
+  memberCards.querySelectorAll("select[data-action='avatar']").forEach((select) => {
+    select.addEventListener("change", (event) => {
+      void saveAndRender(setMemberAvatar(state, event.target.dataset.member, event.target.value));
     });
   });
 }
 
 function renderTaskBoard() {
-  const headers = state.members
-    .map((member) => `<th scope="col">${escapeHtml(member.name)}</th>`)
-    .join("");
+  const headers = state.members.map((member) => `<th scope="col">${escapeHtml(member.name)}</th>`).join("");
 
   const rows = state.tasks
     .map((task) => {
@@ -138,12 +157,7 @@ function renderTaskBoard() {
           return `
             <td class="status-cell">
               <label>
-                <input
-                  type="checkbox"
-                  data-member="${member.id}"
-                  data-task="${task.id}"
-                  ${checked ? "checked" : ""}
-                />
+                <input type="checkbox" data-member="${member.id}" data-task="${task.id}" ${checked ? "checked" : ""} />
                 <span class="status-label ${checked ? "done" : ""}">${checked ? "Done" : "Todo"}</span>
               </label>
             </td>
@@ -155,42 +169,28 @@ function renderTaskBoard() {
     })
     .join("");
 
-  taskBoard.innerHTML = `
-    <thead>
-      <tr>
-        <th scope="col">Task</th>
-        ${headers}
-      </tr>
-    </thead>
-    <tbody>${rows}</tbody>
-  `;
+  taskBoard.innerHTML = `<thead><tr><th scope="col">Task</th>${headers}</tr></thead><tbody>${rows}</tbody>`;
 
   taskBoard.querySelectorAll("input[type='checkbox']").forEach((checkbox) => {
     checkbox.addEventListener("change", (event) => {
-      const memberId = event.target.dataset.member;
-      const taskId = event.target.dataset.task;
-      void saveAndRender(setTaskCompletion(state, memberId, taskId, event.target.checked));
+      void saveAndRender(setTaskCompletion(state, event.target.dataset.member, event.target.dataset.task, event.target.checked));
     });
   });
 }
 
 function handleAction(event) {
-  const action = event.target.dataset.action;
-  const memberId = event.target.dataset.member;
-
-  if (action === "reset") {
-    void saveAndRender(resetMember(state, memberId));
+  if (event.target.dataset.action === "reset") {
+    void saveAndRender(resetMember(state, event.target.dataset.member));
   }
 }
 
 function showConfetti() {
   confettiZone.innerHTML = "";
-
   for (let index = 0; index < 20; index += 1) {
     const piece = document.createElement("span");
     piece.className = "confetti";
     piece.textContent = ["✨", "🎉", "🌸", "💫"][index % 4];
-    piece.style.left = `${Math.floor(Math.random() * 90)}%`;
+    piece.style.left = `${Math.floor(Math.random() * 96)}%`;
     piece.style.animationDelay = `${index * 30}ms`;
     confettiZone.appendChild(piece);
   }

@@ -7,7 +7,7 @@ A cute collaborative 75-day challenge tracker with:
 - Per-person task check-offs so everyone can see who has completed what
 - Automatic 4am rollover that clears checklists and advances each completed member's day count
 - Server-backed shared state so everyone using the same app sees the same progress
-- A cheer section for Caitlyn with encouragement confetti
+- A floating Caitlyn rabbit avatar button for encouragement confetti
 
 ## Run locally
 
@@ -17,3 +17,6 @@ npm start
 ```
 
 Open `http://localhost:4173`.
+
+
+Asset catalogs are defined in `/avatars/catalog.js` and `/background/catalog.js`.

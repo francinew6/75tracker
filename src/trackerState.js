@@ -11,22 +11,22 @@
     "Stick to a diet"
   ];
 
-  const MEMBERS = [
-    { id: "francine", name: "Francine", avatar: "🦊", day: 0 },
-    { id: "jake", name: "Jake", avatar: "🦁", day: 0 },
-    { id: "akai", name: "Akai", avatar: "🐯", day: 0 },
-    { id: "naveen", name: "Naveen", avatar: "🐼", day: 0 },
-    { id: "kaustubh", name: "Kaustubh", avatar: "🦉", day: 0 },
-    { id: "rebekah", name: "Rebekah", avatar: "🐰", day: 0 },
-    { id: "victoria", name: "Victoria", avatar: "🦋", day: 0 },
-    { id: "jack", name: "Jack", avatar: "🐻", day: 0 },
-    { id: "samanyu", name: "Samanyu", avatar: "🐨", day: 0 },
-    { id: "varun", name: "Varun", avatar: "🐸", day: 0 }
+  const MEMBER_SEEDS = [
+    ["francine", "Francine", "https://github.com/user-attachments/assets/0671d73e-5f27-4303-b540-7ad98cbb0414"],
+    ["jake", "Jake", "https://github.com/user-attachments/assets/9b579c14-a975-4e4c-95e4-f851b3be6616"],
+    ["akai", "Akai", "https://github.com/user-attachments/assets/34df0349-42e9-484d-a28b-27d96d621eec"],
+    ["naveen", "Naveen", "https://github.com/user-attachments/assets/b7455fda-6970-4c1c-b05f-933de282b04d"],
+    ["kaustubh", "Kaustubh", "https://github.com/user-attachments/assets/0b67260f-6621-420d-9d8c-441300a19c52"],
+    ["rebekah", "Rebekah", "https://github.com/user-attachments/assets/5e605244-a9f0-4aac-987d-6846463e811b"],
+    ["victoria", "Victoria", "https://github.com/user-attachments/assets/119873d2-151a-407f-97c6-b10368aecbeb"],
+    ["jack", "Jack", "https://github.com/user-attachments/assets/863fb412-40f6-495d-88a7-2fc00bf18a84"],
+    ["samanyu", "Samanyu", "https://github.com/user-attachments/assets/82ae5743-b5f6-47a1-b02e-6329d522f0e9"],
+    ["varun", "Varun", "https://github.com/user-attachments/assets/9b9b4d09-3379-4c1a-9bd2-a954657b8db2"]
   ];
 
   function createDefaultState() {
     return {
-      members: MEMBERS.map((member) => ({ ...member })),
+      members: MEMBER_SEEDS.map(([id, name, avatar]) => ({ id, name, avatar, day: 0 })),
       tasks: TASKS.map((name, index) => ({ id: `task-${index + 1}`, name })),
       completions: {},
       dayKey: getChallengeDayKey(new Date(), ROLLOVER_HOUR)
@@ -44,7 +44,7 @@
       members: members.map((member, index) => ({
         id: member.id || `member-${index}`,
         name: member.name || `Member ${index + 1}`,
-        avatar: member.avatar || "✨",
+        avatar: member.avatar || defaults.members[0].avatar,
         day: Number.isFinite(member.day) ? clamp(member.day, 0, MAX_DAYS) : 0
       })),
       tasks: tasks.map((task, index) => ({
@@ -74,6 +74,15 @@
     };
   }
 
+  function setMemberAvatar(state, memberId, avatarUrl) {
+    return {
+      ...state,
+      members: state.members.map((member) =>
+        member.id === memberId ? { ...member, avatar: avatarUrl || member.avatar } : member
+      )
+    };
+  }
+
   function addMember(state, name, avatar) {
     const safeName = (name || "").trim();
     if (!safeName) {
@@ -93,7 +102,7 @@
     next.members.push({
       id: uniqueId,
       name: safeName,
-      avatar: (avatar || "🐣").trim() || "🐣",
+      avatar: avatar || next.members[0].avatar,
       day: 0
     });
 
@@ -128,12 +137,10 @@
     }
 
     const next = structuredClone(normalized);
-
     next.members = next.members.map((member) => ({
       ...member,
       day: allTasksDoneForMember(normalized, member.id) ? clamp(member.day + 1, 0, MAX_DAYS) : member.day
     }));
-
     next.completions = next.members.reduce((acc, member) => {
       acc[member.id] = {};
       return acc;
@@ -179,6 +186,7 @@
     normalizeState,
     setTaskCompletion,
     setMemberName,
+    setMemberAvatar,
     addMember,
     resetMember,
     isTaskDone,
