@@ -12,29 +12,45 @@ const {
   getTeamDay
 } = window.trackerState;
 
-const STORAGE_KEY = "tracker-state-v1";
-
 const memberCards = document.getElementById("memberCards");
 const taskBoard = document.getElementById("taskBoard");
 const teamCounter = document.getElementById("teamCounter");
 
-let state = loadState();
+let state = createDefaultState();
 
-render();
+void init();
 
-function loadState() {
+async function init() {
+  state = await fetchState();
+  render();
+}
+
+async function fetchState() {
   try {
-    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    const response = await fetch("/api/state");
+    if (!response.ok) {
+      return createDefaultState();
+    }
+
+    const parsed = await response.json();
     return normalizeState(parsed);
   } catch {
     return createDefaultState();
   }
 }
 
-function saveAndRender(nextState) {
+async function saveAndRender(nextState) {
   state = normalizeState(nextState);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   render();
+
+  try {
+    await fetch("/api/state", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(state)
+    });
+  } catch {
+  }
 }
 
 function render() {
@@ -76,7 +92,7 @@ function renderMemberCards() {
   memberCards.querySelectorAll("input[data-action='rename']").forEach((input) => {
     input.addEventListener("change", (event) => {
       const memberId = event.target.dataset.member;
-      saveAndRender(setMemberName(state, memberId, event.target.value));
+      void saveAndRender(setMemberName(state, memberId, event.target.value));
     });
   });
 }
@@ -125,7 +141,7 @@ function renderTaskBoard() {
     checkbox.addEventListener("change", (event) => {
       const memberId = event.target.dataset.member;
       const taskId = event.target.dataset.task;
-      saveAndRender(setTaskCompletion(state, memberId, taskId, event.target.checked));
+      void saveAndRender(setTaskCompletion(state, memberId, taskId, event.target.checked));
     });
   });
 }
@@ -135,22 +151,22 @@ function handleAction(event) {
   const memberId = event.target.dataset.member;
 
   if (action === "minus") {
-    saveAndRender(adjustMemberDay(state, memberId, -1));
+    void saveAndRender(adjustMemberDay(state, memberId, -1));
     return;
   }
 
   if (action === "plus") {
-    saveAndRender(adjustMemberDay(state, memberId, 1));
+    void saveAndRender(adjustMemberDay(state, memberId, 1));
     return;
   }
 
   if (action === "complete") {
-    saveAndRender(completeDay(state, memberId));
+    void saveAndRender(completeDay(state, memberId));
     return;
   }
 
   if (action === "reset") {
-    saveAndRender(resetMember(state, memberId));
+    void saveAndRender(resetMember(state, memberId));
   }
 }
 
