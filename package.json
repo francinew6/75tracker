@@ -1,0 +1,18 @@
+{
+  "name": "75tracker",
+  "version": "1.0.0",
+  "description": "Collaborative tracker for 75 hard and 75 medium accomplishments",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://localhost:26831/francinew6/75tracker"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

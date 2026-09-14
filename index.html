@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>75 Tracker ✨</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <p class="sparkles">✦ ✧ ✦</p>
+        <h1>75 Tracker Club</h1>
+        <p class="subtitle">Cute accountability for your 75 day challenge</p>
+        <p id="teamCounter" class="team-counter"></p>
+      </header>
+
+      <section>
+        <h2>Team Members</h2>
+        <div id="memberCards" class="member-grid"></div>
+      </section>
+
+      <section class="add-member-wrap">
+        <h2>Add New Challenger</h2>
+        <form id="addMemberForm" class="add-member-form">
+          <input id="newMemberName" type="text" placeholder="Name or nickname" required />
+          <select id="newMemberAvatar" aria-label="New member avatar"></select>
+          <button type="submit" class="success">Add member</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Daily Task Board</h2>
+        <p class="small-note">Check off tasks as you complete them. Tasks auto-refresh at 4am daily.</p>
+        <div class="board-wrap">
+          <table id="taskBoard" class="task-board"></table>
+        </div>
+      </section>
+    </main>
+
+    <button id="caitlynButton" class="caitlyn-float" type="button" aria-label="Caitlyn sends encouragement">
+      <img src="https://github.com/user-attachments/assets/66adc648-dfc2-4ec2-a02d-281ecf07eb21" alt="Caitlyn rabbit avatar" />
+      <span>Cheer!</span>
+    </button>
+    <div id="confettiZone" class="confetti-zone" aria-hidden="true"></div>
+
+    <script src="avatars/catalog.js"></script>
+    <script src="background/catalog.js"></script>
+    <script src="src/trackerState.js"></script>
+    <script src="src/main.js"></script>
+  </body>
+</html>
